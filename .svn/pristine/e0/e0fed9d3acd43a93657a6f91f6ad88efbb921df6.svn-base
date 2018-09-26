@@ -1,0 +1,88 @@
+<style lang="less" scoped>
+
+</style>
+
+<template>
+    <div class="view-main">
+        <!--列表页面-->
+        <div class="list-page">
+            <Tabs type="card">
+                <TabPane label="搭电">
+                    <div class="padding-middle">
+                        单次救援价格： <InputNumber :max="10000" :min="1" :step="1" v-model="powerPrice"></InputNumber> 元
+                        <Button type='primary' size='small' style="margin-left:40px;" @click="setda">确定</Button>
+                    </div>
+                </TabPane>
+                <TabPane label="拖车">
+                    <div class="padding-middle">
+                        公里计算： <InputNumber :max="10000" :min="1" :step="1" v-model="minimumKm"></InputNumber> km内
+                        <InputNumber :max="10000" :min="1" :step="1" v-model="priceMinimumKm"></InputNumber> 元/次，
+                        超出部分按 <InputNumber :max="10000" :min="1" :step="1" v-model="pricePerKm"></InputNumber> 元/公里计算
+                        <Button type='primary' size='small' style="margin-left:40px;" @click="settuo">确定</Button>
+                    </div>
+                </TabPane>
+                <TabPane label="换胎">
+                    <div class="padding-middle">
+                        单次换胎价格： <InputNumber :max="10000" :min="1" :step="1" v-model="changeTyre"></InputNumber> 元
+                        <Button type='primary' size='small' style="margin-left:40px;" @click="sethuan">确定</Button>
+                    </div>
+                </TabPane>
+            </Tabs>
+        </div>
+    </div>
+</template>
+
+<script>
+import {zPage} from '@/core'
+
+export default {
+    name: 'demo',
+    components: {
+        zPage
+    },
+    data () {
+        return {
+            powerPrice:0,
+            changeTyre:0,
+            minimumKm:0,
+            priceMinimumKm:0,
+            pricePerKm:0,
+            serviceItemId:''
+        };
+    },
+    mounted () {
+        console.log('首次进来或刷新之后');
+        this.post(Api.server.getSingle,(res)=>{
+            [this.powerPrice,this.changeTyre,this.minimumKm,this.priceMinimumKm,this.pricePerKm,this.serviceItemId]=[res.object.powerPrice,res.object.changeTyre,res.object.minimumKm,res.object.priceMinimumKm,res.object.pricePerKm,res.object.serviceItemId];
+        });
+    },
+    methods: {
+        //分页组件吐出数据
+        getPageData: function(list){
+            this.list = list.object;
+        },
+        //当筛选参数改变的时候，重新触发分页组建
+        getParam: function(param){
+            let _this = this;
+            this.dataSource.param = param;
+            this.utils.refshData(_this)
+        },
+        //在不同的切换标签下，用户点击确定按钮
+        setda:function() {
+            this.post(Api.server.update,{powerPrice:this.powerPrice.toString(),serviceItemId:this.serviceItemId},(res)=>{
+                this.$Message.success("设置成功！")
+            })
+        },
+        settuo:function() {
+            this.post(Api.server.update,{minimumKm:this.powerPrice,priceMinimumKm:this.priceMinimumKm,pricePerKm:this.pricePerKm,serviceItemId:this.serviceItemId},(res)=>{
+                this.$Message.success("设置成功！")
+            })
+        },
+        sethuan:function() {
+            this.post(Api.server.update,{changeTyre:this.changeTyre,serviceItemId:this.serviceItemId},(res)=>{
+                this.$Message.success("设置成功！")
+            })
+        }
+    }
+};
+</script>

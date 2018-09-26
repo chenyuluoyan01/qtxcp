@@ -1,0 +1,11 @@
+{
+  "name": "snail-utils",
+  "version": "1.0.1",
+  "description": "一个常用的工具类封装",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "yuyang009",
+  "license": "ISC"
+}

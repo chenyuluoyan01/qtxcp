@@ -1,0 +1,157 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div>
+        <z-search :searchData='searchData' @getParam='getParam'></z-search>
+        <z-table :titles='titles' :list='list'></z-table>
+        <z-page v-if='refsh' :dataSource='dataSource' @getData='getPageData'></z-page>
+    </div>
+</template>
+
+<script>
+import {zTable,zPage,zSearch} from '@/core'
+export default {
+    name: 'demo',
+    components: {
+        zTable,zPage,zSearch
+    },
+    data () {
+        return {
+            refsh:true,
+            dataSource:{
+                url:Api.login,
+                param:{phone:17603006126,password:"12345678"}
+            },
+            searchData:{
+                source:{
+                    type:{
+                        listName:"name",
+                        listId:"id",
+                        list:[
+                            {
+                                name:"余洋",
+                                id:"1"
+                            },
+                            {
+                                name:"大头",
+                                id:"2"
+                            },
+                            {
+                                name:"小偷",
+                                id:"3"
+                            }
+                        ]
+                    }
+                },
+                list:[
+                    {
+                        type:"input",
+                        name:"姓名",
+                        id:"userName"
+                    },
+                    {
+                        type:"select",
+                        name:"状态选择",
+                        id:"type",
+                        source:"type"
+                    },
+                    {
+                        type:"daterange",
+                        name:"起止日期",
+                        id:"timeList"
+                    }
+                ],
+                rel:{
+                    userName:"",
+                    type:"",
+                    timeList:[]
+                }
+            },
+            titles: [
+                {
+                    title:"序号",
+                    render: (h,params) => {
+                    return h('span',{
+                            style:{width:'60px'}
+                        },params.index)
+                    }
+                },
+                {
+                    title:"流水号",
+                    key:"lsh"
+                },
+                {
+                    title:"时间",
+                    key:"time"
+                },
+                {
+                    title:"交易角色",
+                    key:"jyjs"
+                },
+                {
+                    title:"交易类型",
+                    key:"jylx"
+                },
+                {
+                    title:"交易方式",
+                    key:"jyfs"
+                },
+                {
+                    title:"交易账号",
+                    key:"jyzh"
+                },
+                {
+                    title:"交易金额",
+                    key:"jyje"
+                },
+                {
+                    title:"操作",
+                    btns:[
+                        {
+                            text:"查看",
+                            on:"view"
+                        },
+                        {
+                            text:"删除",
+                            on:"view"
+                        }
+                    ]
+                }
+            ],
+            list:[
+                {
+                    lsh:"12344",
+                    time:"32424",
+                    jyjs:"车主",
+                    jylx:"收入",
+                    jyfs:"支付宝",
+                    jyzh:"sfsg@123",
+                    jyje:"1234"
+                }
+            ]
+        };
+    },
+    mounted () {
+    },
+    methods: {
+        //分页组件吐出数据
+        getPageData: function(list){
+            console.log(list)
+        },
+        //当筛选参数改变的时候，重新触发分页组建
+        getParam: function(param){
+            this.dataSource.param = param;
+            this.refsh = false;
+            $Vue.nextTick(()=>{
+                this.refsh = true;
+            });
+        },
+        //表格操作函数
+        view: function(params){
+            alert(params.lsh)
+        }
+    }
+};
+</script>

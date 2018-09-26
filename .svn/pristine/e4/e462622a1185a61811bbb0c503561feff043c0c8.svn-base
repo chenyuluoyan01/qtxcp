@@ -1,0 +1,119 @@
+<style lang="less">
+    .star {
+        display:inline-block;
+        width:70px;
+    }
+</style>
+
+<template>
+    <div>
+        <div class="i-form">
+            <Modal v-model='openPic'>
+                <img :src="currentUrl" class="pic-modal">
+            </Modal>
+            <Form :ref="formData.rel" :model="formData.rel" :label-width="120">
+                <h2 class="padding-left-small main-color padding-bottom-small text">基础信息</h2>
+                <FormItem label="时间：">
+                    <span>{{formData.rel.appraiseTime | formatDate}}</span>
+                </FormItem>
+                <FormItem label="店铺名：">
+                    <span>{{formData.rel.nickName}}</span>
+                </FormItem>
+                <FormItem label="车主账号">
+                    <span>{{formData.rel.appraiseId}}</span>
+                </FormItem>
+                <FormItem label="订单号：">
+                   <span>{{formData.rel.orderNum}}</span>
+                </FormItem>
+                <FormItem label="车型：">
+                   <span>{{formData.rel.userCarVersion}}</span>
+                </FormItem>
+                <FormItem label="态度评分">
+                   <span class="star">
+                       <Icon type="android-star" size="16" color="red" v-for = 'i in appraiseDtlList[0]' :key = 'i'></Icon>
+                   </span>
+                   <span>{{appraiseDtlList[0]}}</span>
+                </FormItem>
+                <FormItem label="服务评分">
+                   <span class="star">
+                        <Icon type="android-star" size="16" color="red" v-for = 'i in appraiseDtlList[1]' :key = 'i'></Icon>  
+                   </span>                 
+                   <span>{{appraiseDtlList[1]}}</span>
+                </FormItem>
+                <FormItem label="店面环境">
+                   <span class="star">
+                       <Icon type="android-star" size="16" color="red" v-for = 'i in appraiseDtlList[2]' :key = 'i'></Icon>
+                   </span>
+                   <span>{{appraiseDtlList[2]}}</span>
+                </FormItem>
+                <FormItem label="评论内容">
+                   <span>{{formData.rel.appraiseComments}}</span>
+                </FormItem>
+                <FormItem label="图片：">
+                    <img
+                        v-for = '(e,i) in picList'
+                        :key = 'i+"img"'
+                        style="height:220px;"
+                        @click='currentUrl=e,openPic=true'
+                        :src="e"
+                        class='pointer'
+                    >
+                </FormItem>
+                <FormItem label="状态">
+                   <span>{{formData.rel.appraiseStatus==0?"待审核":(formData.rel.appraiseStatus==1?"通过":"未通过")}}</span>
+                </FormItem>
+            </Form>
+        </div>        
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'demo',
+    props: ["detail"],
+    components: {
+
+    },
+    data () {
+        return {
+            currentUrl:"",
+            openPic:false,           
+            formData:{
+                rel:{
+                    appraiseTime:"",
+                    nickName:"",
+                    appraiseId:"",
+                    orderNum:"",
+                    userCarVersion:"",
+                    appraiseComments:"",
+                    tradeWay:"",
+                    appraiseStatus:""
+                }
+            },
+            appraiseDtlList:[],
+            picList:[]
+        }
+    },
+    mounted () {
+        this.init()
+    },
+    methods: {
+        init: function(){
+            this.getPromise()
+        },
+        getPromise: function(){
+            let d = this.detail;
+            this.get(Api.appraise.getById,{appraiseId:d.appraiseId},res=>{
+                this.formData.rel = this.utils.getObjByKeys(this.formData.rel,res.object[0]);
+                let [len,picLen]=[res.object[0].appraiseDtlList.length,res.object[0].picList.length];
+                for(let i=0;i<len;i++) {
+                    this.appraiseDtlList.push(res.object[0].appraiseDtlList[i].score);
+                }
+                for(let j=0;j<picLen;j++) {
+                    this.picList.push(res.object[0].picList[j].picUrl);
+                }
+            })
+        }
+    }
+};
+</script>

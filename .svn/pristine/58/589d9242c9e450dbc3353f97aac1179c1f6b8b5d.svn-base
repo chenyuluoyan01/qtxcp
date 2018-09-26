@@ -1,0 +1,128 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div class="view-main">
+        <!--列表页面-->
+        <div class="list-page">
+            <z-search :searchData='searchData' @getParam='getParam'></z-search>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="width-60">序号</th>
+                        <th>创建时间</th>
+                        <th>地区</th>
+                        <th>店铺名</th>
+                        <th>姓名</th>
+                        <th>联系方式</th>
+                        <th class="width-200">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for = "(item,index) in list" :key='index+"xc"'>
+                        <td>{{index+1}}</td>
+                        <td v-if='item.createtime'>{{item.createtime | formatDate}}</td>
+                        <td v-else></td>
+                        <td>{{item.province+"-"+item.city+"-"+item.district}}</td>
+                        <td>{{item.factoryName}}</td>
+                        <td>{{item.userName}}</td>
+                        <td>{{item.contact}}</td>
+                        <td>
+                            <span class="btn" @click='view(item)'>查看</span>
+                            <!-- <freeze @freeze='freeze(item)'></freeze> -->
+                            <!-- <cut @del='del(item)'></cut> -->
+                        </td>
+                    </tr>
+                    <tr v-if='list.length == 0'><td colspan="7">暂无数据</td></tr>
+                </tbody>
+            </table>
+            <z-page v-if='refsh' :dataSource='dataSource' @getData='getPageData'></z-page>
+        </div>
+
+        <!--查看-->
+        <Modal
+            v-model='viewConfig.modal'
+            width="60vw"
+            :mask-closable='false'
+            ok-text='确定'
+            title='查看加盟申请'
+        >
+            <views :detail="detail"  v-if='viewConfig.modal' :name="viewConfig.name" ref='view' />
+            <div slot="footer">
+                <Button @click="viewConfig.modal=false">返回</Button>
+            </div>
+        </Modal>
+
+    </div>
+</template>
+
+<script>
+import {zTable,zPage,zSearch,zModel,freeze,cut} from '@/core'
+import views from './sub/view.vue'
+
+export default {
+    name: 'demo',
+    components: {
+        zPage,zSearch,freeze,views,cut,zModel
+    },
+    data () {
+        return {
+            viewConfig:{
+               modal:false,
+               name:"viewConfig"
+            },
+            refsh:true,
+            detail:{},
+            dataSource:{
+                url:Api.msg.league.get,
+                param:{}
+            },
+            searchData:{
+                source:{},
+                list:[
+                    {
+                        type:"input",
+                        name:"维修厂",
+                        id:"factoryName"
+                    }
+                ],
+                rel:{
+                    factoryName:""
+                }
+            },
+            list:[]
+        };
+    },
+    mounted () {
+    },
+    methods: {
+        /*del: function(item){
+            let suggestionId = item.suggestionId;
+            let data = {suggestionId:suggestionId}
+            this.post(Api.msg.suggestion.delete,data,(res)=>{
+                let _this = this;
+                this.$Message.success("删除意见反馈成功！");
+                this.utils.refshData(_this)
+            })
+        },*/
+        //分页组件吐出数据
+        getPageData: function(list){
+            this.list = list.object;
+        },
+        //当筛选参数改变的时候，重新触发分页组建
+        getParam: function(param){
+            let _this = this;
+            this.dataSource.param = param;
+            this.utils.refshData(_this)
+        },
+        //表格操作函数
+        view: function(params){
+            this.detail = params;
+            $Vue.nextTick(()=>{
+                this.viewConfig.modal = true;
+            });
+        },
+    }
+};
+</script>

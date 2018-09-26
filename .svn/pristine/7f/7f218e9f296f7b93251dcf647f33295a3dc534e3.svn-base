@@ -1,0 +1,83 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div>
+        <div class="i-form">
+            <Form :ref="formData.rel" :model="formData.rel" :label-width="120">
+            <h2 class="padding-left-small main-color padding-bottom-small text">基础信息</h2>
+                <FormItem label="流水账号：">
+                    <span>{{formData.rel.orderNum}}</span>
+                </FormItem>
+                <FormItem label="时间：">
+                    <span>{{formData.rel.tradeTime | formatDate}}</span>
+                </FormItem>
+                <FormItem label="角色：">
+                   <span>{{formData.rel.tradeRole ==1?"车主":"汽修厂"}}</span>
+                </FormItem>
+                <FormItem label="交易账号：">
+                   <span>{{formData.rel.tradeAccount}}</span>
+                </FormItem>
+                <FormItem label="交易方式">
+                   <span>{{formData.rel.tradeWay == "1"?"支付宝":(formData.rel.tradeWay==2?"微信":"银行")}}</span>
+                </FormItem>
+                <FormItem label="交易类型">
+                   <span>{{formData.rel.tradeType == "1"?"订单收入":(formData.rel.tradeType == "2"?"退款支出":"结算支出")}}</span>
+                </FormItem>
+                <FormItem label="交易金额：">
+                    <span>{{formData.rel.tradeAmount}}</span>
+                </FormItem>
+                <FormItem label="操作人：" v-if="formData.rel.tradeType == 3">
+                    <span></span>
+                </FormItem>
+                <!-- <h2 class="padding-left-small main-color padding-bottom-small text">优惠促销</h2>
+                <FormItem label="优惠券：">
+                   <span>5 张</span>
+                </FormItem>
+                <FormItem label="积分：">
+                   <span>1000</span>
+                </FormItem> -->
+            </Form>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'demo',
+    props: ["detail"],
+    components: {
+
+    },
+    data () {
+        return {
+            formData:{
+                rel:{
+                    orderNum:"",
+                    tradeAccount:"",
+                    tradeAmount:"",
+                    tradeRecordId:"",
+                    tradeRole:"",
+                    tradeTime:"",
+                    tradeType:"",
+                    tradeWay:""
+                }
+            }
+        }
+    },
+    mounted () {
+        this.init();
+    },
+    methods: {
+        init: function(){
+            this.getPromise();
+        },
+        getPromise: function(){
+            let d = this.detail;
+            this.formData.rel = this.utils.getObjByKeys(this.formData.rel,d);
+            console.log(this.detail);
+        }
+    }
+};
+</script>

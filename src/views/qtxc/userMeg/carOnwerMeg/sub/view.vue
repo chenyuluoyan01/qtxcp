@@ -1,0 +1,88 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div>
+        <div class="i-form">
+            <Form :ref="formData.rel" :model="formData.rel" :label-width="120">
+            <h2 class="padding-left-small main-color padding-bottom-small text">基础信息</h2>
+                <FormItem label="用户账号：">
+                    <span>{{formData.rel.phone}}</span>
+                </FormItem>
+                <FormItem label="用户ID：">
+                    <span>{{formData.rel.userId}}</span>
+                </FormItem>
+                <FormItem label="用户头像：">
+                    <img class="user-img-cirle" v-lazy="formData.rel.photo" alt="用户头像">
+                </FormItem>
+                <FormItem label="昵称：">
+                   <span>{{formData.rel.nickName}}</span>
+                </FormItem>
+                <FormItem label="性别：">
+                   <span>{{(formData.rel.sex == 'F')?'女':'男'}}</span>
+                </FormItem>
+                <FormItem label="注册时间：">
+                   <span>{{formData.rel.registerTime | formatDate}}</span>
+                </FormItem>
+                <FormItem label="账号状态：">
+                   <span>{{formData.rel.userStatus == "0"?"正常":"冻结"}}</span>
+                </FormItem>
+                <FormItem label="最后登录时间：">
+                   <span>{{formData.rel.lastLoginTime | formatDate}}</span>
+                </FormItem>
+                <h2 class="padding-left-small main-color padding-bottom-small text">车辆信息</h2>
+                <ul class="padding-left-small padding-bottom-small">
+                    <li class="padding-xs" v-for='(item,i) in formData.rel.userCarList'>{{item.carTypeName}}</li>
+                </ul>
+                <!-- <h2 class="padding-left-small main-color padding-bottom-small text">优惠促销</h2>
+                <FormItem label="优惠券：">
+                   <span>5 张</span>
+                </FormItem>
+                <FormItem label="积分：">
+                   <span>1000</span>
+                </FormItem> -->
+            </Form>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'peopleView',
+    props:["name","detail"],
+    components: {
+    },
+    data () {
+        return {
+            formData:{
+                rel:{
+                    phone:"",
+                    userId:"",
+                    photo:"",
+                    nickName:"",
+                    sex:"",
+                    registerTime:"",
+                    userStatus:"",
+                    lastLoginTime:"",
+                    userCarList:[]
+                }
+            }
+        }
+    },
+    mounted () {
+        this.handleInit();
+    },
+    methods: {
+        handleInit(){
+            let d = this.detail;
+            //this.formData.rel = this.utils.getObjByKeys(this.formData.rel,JSON.parse(JSON.stringify(d)));
+
+            this.get(Api.user.carUser.getById,{userId:d.userId},res=>{
+                this.formData.rel = this.utils.getObjByKeys(this.formData.rel,res.object);
+                this.formData.rel.userId = d.userId;
+            })
+        }
+    }
+};
+</script>

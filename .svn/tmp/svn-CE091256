@@ -1,0 +1,4 @@
+<<<<<<< .mine
+||||||| .r814
+export default "development";=======
+export default "production";>>>>>>> .r924

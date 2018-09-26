@@ -1,0 +1,112 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div>
+        <div class="i-form">
+            <Modal v-model='openPic'>
+                <img :src="currentUrl" class="pic-modal">
+            </Modal>
+            <Form :ref="formData.rel" :model="formData.rel" :label-width="120">
+                <FormItem label="时间：" class="formMust">
+                    <span v-if='formData.rel.createtime'>{{formData.rel.createtime | formatDate}}</span>
+                    <span v-else></span>
+                </FormItem>
+                <FormItem label="店铺名：" class="formMust">
+                    <span>{{formData.rel.factoryName}}</span>
+                </FormItem>
+                <FormItem label="地址：" class="formMust">
+                    <p style="width:360px;">{{formData.rel.province+"-"+formData.rel.city+"-"+formData.rel.district}}</p>
+                </FormItem>
+                <FormItem label="姓名：" class="formMust">
+                    <span>{{formData.rel.userName}}</span>
+                </FormItem>
+                <FormItem label="联系方式：" class="formMust">
+                    <span>{{formData.rel.contact}}</span>
+                </FormItem>
+                <FormItem label="照片：" class="formMust">
+                    <div>
+                        <img
+                            v-for = '(e,i) in formData.rel.userLeaguePictureIdList'
+                            :key = 'i+"img"'
+                            style="height:220px;"
+                            @click='currentUrl=e.url,openPic=true'
+                            :src="e.url"
+                            class='pointer'
+                        >
+                    </div>
+                </FormItem>
+            </Form>
+        </div>
+    </div>
+</template>
+
+<script>
+import {freeText,upload} from '@/core'
+export default {
+    name: 'peopleAdd',
+    props:["name","detail"],
+    components: {
+        freeText,upload
+    },
+    data () {
+        return {
+            currentUrl:"",
+            openPic:false,
+            loadInit:false,
+            formData:{
+                imgUpConfig:{
+                    count:1,
+                    defaultList:[],
+                    fileDir:'msg'
+                },
+                messageTypeList:{
+                    listName:"keyLabel",
+                    listId:"keyValue",
+                    list:[
+                        {
+                            keyLabel:"全部",
+                            keyValue:"0"
+                        },
+                        {
+                            keyLabel:"车主",
+                            keyValue:"1"
+                        },
+                        {
+                            keyLabel:"汽车厂",
+                            keyValue:"2"
+                        }
+                    ]
+                },
+                initF:false,
+                rel:{
+                    createtime:"",
+                    city:"",
+                    district:"",
+                    factoryName:"",
+                    province:"",
+                    content:"0",
+                    userName:"",
+                    contact:"",
+                    userLeaguePictureIdList:[]
+                }
+            }
+        }
+    },
+    mounted () {
+        this.handleInit();
+    },
+    methods: {
+        handleInit(){
+            let d = this.detail;
+            this.formData.rel = this.utils.getObjByKeys(this.formData.rel,JSON.parse(JSON.stringify(d)));
+            this.formData.imgUpConfig.defaultList[0] = {url:this.formData.rel.messagePic}
+            this.loadInit = true;
+        },
+        getUpList(url){
+            this.formData.rel.messagePic = url;
+        },
+    }
+};
+</script>

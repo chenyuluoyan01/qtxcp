@@ -1,0 +1,176 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div>
+        <Tabs value="name1">
+            <TabPane label="订单基本信息" name="name1">
+                <div class="i-form">
+                    <Form :ref="formData.rel" :model="formData.rel" :label-width="120">
+                        <FormItem label="订单号：">
+                            <span>{{formData.rel.orderNum}}</span>
+                        </FormItem>
+                        <FormItem label="位置：">
+                            <span>{{formData.rel.address}}</span>
+                        </FormItem>
+                        <FormItem label="时间：">
+                            <span>{{formData.rel.createTime | formatDate}}</span>
+                        </FormItem>
+                        <FormItem label="车型：">
+                            <span>{{formData.rel.userCarCarTypeName}}</span>
+                        </FormItem>
+                        <FormItem label="车牌号：">
+                            <span>{{formData.rel.cardIdNum}}</span>
+                        </FormItem>
+                        <FormItem label="姓名：">
+                            <span>{{formData.rel.contacts}}</span>
+                        </FormItem>
+                        <FormItem label="手机号：">
+                            <span>{{formData.rel.contactsPhone}}</span>
+                        </FormItem>
+                    </Form>
+                </div>
+            </TabPane>
+            <TabPane label="订单详情" name="name2">
+                <OrderMulty :detail='detail' ></OrderMulty>
+            </TabPane>
+            <TabPane label="门店信息" name="name3">
+                <div class="i-form" v-if='this.detail.factoryId'>
+                    <Form :ref="doorData.rel" :model="doorData.rel" :label-width="120">
+                        <FormItem label="汽修店名：">
+                            <span>{{doorData.rel.factoryName}}</span>
+                        </FormItem>
+                        <FormItem label="电话：">
+                            <span>{{doorData.rel.factoryPhone}}</span>
+                        </FormItem>
+                        <FormItem label="服务时间：">
+                            <span>{{doorData.rel.openStartTime}}</span>
+                            <span>-- {{doorData.rel.openEndTime}}</span>
+                        </FormItem>
+                        <FormItem label="地址：">
+                            <span>{{doorData.rel.factoryAddress}}</span>
+                        </FormItem>
+                        <FormItem label="维修结果：">
+                            <span v-if="doorData.rel.factorysPictureList&&doorData.rel.factorysPictureList.length">
+                                <span v-for="v in doorData.rel.factorysPictureList">
+                                    <img v-lazy="v.url">
+                                </span>
+                            </span>
+                        </FormItem>
+                    </Form>
+                </div>
+                <p v-else class="no-data-p">暂无门店信息 </p>
+            </TabPane>
+            <TabPane label="车主信息" name="name4">
+                <div class="i-form">
+                    <Form :ref="CarData.rel" :model="CarData.rel" :label-width="120">
+                        <div v-if='detail.userCardId'>
+                            <FormItem label="联系人：">
+                                <span>{{formData.rel.nickName}}</span>
+                            </FormItem>
+                            <FormItem label="手机号：">
+                                <span>{{formData.rel.contactsPhone}}</span>
+                            </FormItem>
+                            <FormItem label="车型：">
+                            <span>{{CarData.rel.carTypeName}}</span>
+                            </FormItem>
+                            <FormItem label="车牌号：">
+                            <span>{{formData.rel.cardIdNum}}</span>
+                            </FormItem>
+                            <FormItem label="汽车里程：">
+                            <span>{{CarData.rel.driveDistance}}</span>
+                            </FormItem>
+                        </div>
+                        <div v-else>
+                            <FormItem label="联系人：">
+                                <span>{{detail.userCarNickName}}</span>
+                            </FormItem>
+                            <FormItem label="手机号：">
+                                <span>{{detail.userCarPhone}}</span>
+                            </FormItem>
+                        </div>
+                    </Form>
+                </div>
+            </TabPane>
+            <TabPane :label="label" name="name5">
+                <AfterSale :detail='detail' ></AfterSale>
+            </TabPane>
+        </Tabs>
+    </div>
+</template>
+
+<script>
+import OrderMulty from "./lib/order_multy.vue"
+import AfterSale from './lib/afterSale.vue'
+export default {
+    name: 'peopleView',
+    props:["name","detail"],
+    data () {
+        return {
+            label:"售后",
+            formData:{
+                rel:{
+                }
+            },
+            doorData:{
+                rel:{
+
+                }
+            },
+            CarData:{
+                rel:{}
+            }
+        }
+    },
+    components: {
+        OrderMulty,AfterSale
+    },
+    mounted () {
+        this.handleInit();
+        this.doorInfo();
+        this.carOwner();
+        this.getAfterSale();
+    },
+    methods: {
+        handleInit(){
+            let d = this.detail;
+            this.formData.rel = this.utils.assign(d);
+        },
+        getAfterSale(){
+            this.get(Api.order.getAfterSale,{orderNum:this.detail.orderNum},res =>{
+                let list = res.object || [];
+                let afterSaleDetail = list[0] || {};
+                if(afterSaleDetail.state == 4){
+                    this.label = (h) => {
+                        return h('div', [
+                            h('span', '售后'),
+                            h('Badge', {
+                                props: {
+                                    count: 1
+                                }
+                            })
+                        ])
+                    }
+                };
+            })
+        },
+        doorInfo(){
+            let d = this.detail;
+            if(d.factoryId){
+                this.get(Api.user.factory.getFactory,{factoryId:d.factoryId},res=>{
+                    this.doorData.rel = res.object[0];
+                });
+            }
+        },
+        carOwner(){
+            let d = this.detail;
+            if(d.userCardId){
+                this.get(Api.order.carOwner,{userCardId:d.userCardId},res=>{
+                    this.CarData.rel = res.object[0];
+                })
+            }
+        }
+    }
+};
+</script>

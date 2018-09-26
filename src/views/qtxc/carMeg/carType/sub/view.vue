@@ -1,0 +1,74 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div>
+        <div class="i-form">
+            <Form :label-width="120">
+                <FormItem label="品牌名称：" class="formMust">
+                   <span>{{detail.brandName}}</span>
+                </FormItem>
+                <FormItem label="车型名称：" class="formMust">
+                    <span>{{detail.carTypeName}}</span>
+                </FormItem>
+                <FormItem label="产地：" class="formMust">
+                    <span>{{origin}}</span>
+                </FormItem>
+                <FormItem label="品牌系列：" class="formMust">
+                    <span>{{detail.carsName}}</span>
+                </FormItem>
+                <!-- <FormItem label="版本：" class="formMust">
+                    <span>{{detail.version}}</span>
+                </FormItem> -->
+                <FormItem label="生产年份：" class="formMust" >
+                    <span>{{detail.produceYear}}</span>
+                </FormItem>
+                <!-- <FormItem label='档位' class="formMust" >
+                    <span>{{detail.gear == "0"?"自动":"手动"}}</span>
+                </FormItem> -->
+                <FormItem label="火花塞使用量：" class="formMust">
+                    <span>{{detail.sparkAmount}}</span>
+                </FormItem>
+                <FormItem label="机油使用量 ( L )：" class="formMust">
+                    <span>{{detail.oilAmount}}</span>
+                </FormItem>
+                <FormItem label="排量：" class="formMust">
+                    <span>{{detail.emission}}</span>
+                </FormItem>
+                <FormItem label='新能源' class="formMust" >
+                    <span>{{detail.newEnergy == "Y"?"是":"否"}}</span>
+                </FormItem>
+            </Form>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'demo',
+    props: ["detail"],
+    components: {
+
+    },
+    data () {
+        return {
+            origin:""
+        }
+    },
+    mounted () {
+        this.init()
+    },
+    methods: {
+        init(){
+            let brandList = JSON.parse(JSON.stringify(this.$parent.$parent.searchData.source.brand.list));
+            for(let i in brandList){
+                if(brandList[i].brandId == this.detail.brandId){
+                    this.origin = brandList[i].origin;
+                }
+            };
+            this.origin = this.origin||"未知产地";
+        }
+    }
+};
+</script>

@@ -1,0 +1,66 @@
+<style lang="less">
+</style>
+
+<template>
+    <div class="view-main">
+        <!--列表页面-->
+        <div class="list-page">
+            <Tabs type="card">
+                <TabPane label="搭电">
+                    <div class="padding-middle">
+                        单次救援价格： <InputNumber :max="10000" :min="1" :step="1" v-model="powerPrice"></InputNumber> 元
+                        <Button type='primary' size='small' style="margin-left:40px;">确定</Button>
+                    </div>
+                </TabPane>
+                <TabPane label="拖车">
+                    <div class="padding-middle">
+                        公里计算： <InputNumber :max="10000" :min="1" :step="1" v-model="minimumKm"></InputNumber> km内
+                        <InputNumber :max="10000" :min="1" :step="1" v-model="priceMinimumKm"></InputNumber> 元/次，
+                        超出部分按 <InputNumber :max="10000" :min="1" :step="1" v-model="pricePerKm"></InputNumber> 元/公里计算
+                        <Button type='primary' size='small' style="margin-left:40px;">确定</Button>
+                    </div>
+                </TabPane>
+                <TabPane label="换胎">
+                    <div class="padding-middle">
+                        单次换胎价格： <InputNumber :max="10000" :min="1" :step="1" v-model="changeTyre"></InputNumber> 元
+                        <Button type='primary' size='small' style="margin-left:40px;">确定</Button>
+                    </div>
+                </TabPane>
+            </Tabs>
+        </div>
+    </div>
+</template>
+
+<script>
+import {zPage} from '@/core'
+
+export default {
+    name: 'demo',
+    components: {
+        zPage
+    },
+    data () {
+        return {
+            powerPrice:"",
+            changeTyre:"",
+            minimumKm:"",
+            priceMinimumKm:"",
+            pricePerKm:""
+        };
+    },
+    mounted () {
+    },
+    methods: {
+        //分页组件吐出数据
+        getPageData: function(list){
+            this.list = list.object;
+        },
+        //当筛选参数改变的时候，重新触发分页组建
+        getParam: function(param){
+            let _this = this;
+            this.dataSource.param = param;
+            this.utils.refshData(_this)
+        }
+    }
+};
+</script>

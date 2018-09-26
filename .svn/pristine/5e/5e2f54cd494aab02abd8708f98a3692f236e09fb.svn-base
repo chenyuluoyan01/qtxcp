@@ -1,0 +1,57 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <div>
+        <Tabs value="name1">
+            <TabPane label="订单基本信息" name="name1">
+
+            </TabPane>
+            <TabPane label="订单详情" name="name2">
+
+            </TabPane>
+            <TabPane label="门店信息" name="name3">
+
+            </TabPane>
+            <TabPane label="发票信息" name="name4">
+
+            </TabPane>
+            <TabPane label="售后" name="name5">
+
+            </TabPane>
+        </Tabs>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'peopleView',
+    props:["name","detail"],
+    components: {
+    },
+    data () {
+        return {
+            formData:{
+                rel:{
+                    nickName:"",
+                    roleName:"",
+                    phone:"",
+                    platformRoleId:"",
+                    sex:"M"
+                }
+            }
+        }
+    },
+    mounted () {
+        this.handleInit();
+    },
+    methods: {
+        handleInit(){
+            let d = this.detail;
+            this.formData.rel = this.utils.getObjByKeys(this.formData.rel,JSON.parse(JSON.stringify(d)));
+            this.formData.rel.userId = d.userId;
+        }
+    }
+};
+</script>

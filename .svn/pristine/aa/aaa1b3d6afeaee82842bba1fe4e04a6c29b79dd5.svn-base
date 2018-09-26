@@ -1,0 +1,105 @@
+<style lang="less">
+    .form-item{
+        margin-left: 80%;
+    }
+</style>
+
+<template>
+    <div>
+        <Modal v-model='pictureLook'>
+            <img :src="currentUrl" style="width: 80%;margin-left:10%;margin-top:30%;">
+        </Modal>
+        <Card :title="detail.orderType | getOrderType">
+            <div v-if='detail.orderType == "0" || detail.orderType == "1" ||  detail.orderType == "2" ||  detail.orderType == "6"' style="max-height:50vh;overflow-y:auto;position:relative;">
+                <table class="table table-hover">
+                    <thead>
+                        <th style="width:180px;">商品主图</th>
+                        <th>商品名</th>
+                        <th style="width:180px;">商品价格</th>
+                    </thead>
+                    <tbody>
+                        <tr  :key='index+"xc"'  v-for = '(item , index) in detail.orderDetailList || []'>
+                            <td>
+                                <img
+                                    ref='imgs'
+                                    @click='lookPic(index)'
+                                    v-lazy='item.mainPicture'
+                                    style="width:60px;height:60px;cursor:pointer"
+                                >
+                            </td>
+                            <td>{{item.goodsName}}</td>
+                            <td>￥{{item.totalAmount?item.totalAmount:0}}</td>
+                        </tr>
+                        <tr v-if='detail.orderDetailList == null || (detail.orderDetailList && detail.orderDetailList.length == 0)'><td colspan="3">暂无数据</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-else>
+                <Form>
+                    <FormItem :label="detail.orderType | getOrderType">
+                        <span class="main-color"><b class="text text-big main-color">￥</b>{{detail.amount}}</span>
+                    </FormItem>
+                    <FormItem label="地点">
+                        <span>{{detail.address}}</span>
+                    </FormItem>
+                </Form>
+            </div>
+            <Form>
+                <FormItem label="金额：" class='form-item'>
+                    <span class="main-color"><b class="text text-big main-color">￥</b>{{detail.amount}}</span>
+                </FormItem>
+            </Form>
+        </Card>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'order_multy',
+    props:["detail"],
+    components: {
+    },
+    filters:{
+        getOrderType: function(orderType){
+            let orderTypeDes = "保养订单";
+            if(orderType == "1"){
+                orderTypeDes = "维修订单";
+            }else if(orderType == "2"){
+                orderTypeDes = "钣金喷漆";
+            }else if(orderType == "3"){
+                orderTypeDes = "换胎";
+            }else if(orderType == "4"){
+                orderTypeDes = "搭电";
+            }else if(orderType == "5"){
+                orderTypeDes = "拖车";
+            }else if(orderType == "6"){
+                orderTypeDes = "门店订单";
+            };
+            return orderTypeDes
+        }
+    },
+    data () {
+        return {
+            pictureLook:false,
+            currentUrl:false,
+            formData:{
+                rel:{
+
+                }
+            }
+        }
+    },
+    mounted () {
+        this.handleInit();
+    },
+    methods: {
+        handleInit(){
+
+        },
+        lookPic: function(index){
+            this.currentUrl = this.$refs.imgs[index].src;
+            this.pictureLook = true;
+        },
+    }
+};
+</script>

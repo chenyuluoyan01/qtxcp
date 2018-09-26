@@ -1,0 +1,184 @@
+<style lang="less">
+
+.description,.description li{
+    padding:0;
+    margin:0;
+    font-size:14px;
+    line-height:26px;
+}
+.description{
+    margin-top:10px;
+}
+</style>
+
+<template>
+    <div>
+        <div class="i-form">
+            <Form :ref="formData.rel" :model="formData.rel" :label-width="120">
+                <FormItem label="选择品牌名称：" class="formMust" >
+                   <Select @on-change='gets' v-model='formData.rel.brandId'  style='width:200px;'>
+                     <Option v-for='(todo,i) in formData.brandList.list' :key='"1xd"+i' :value='todo[formData.brandList.listId]'>{{todo[formData.brandList.listName]}}</Option>
+                   </Select>
+                    <span v-if='formData.initF&&formData.rel.brandId.toString()==""' class="error-mark">
+                    <Icon type="close-circled"></Icon> 必填
+                    </span>
+                </FormItem>
+                <FormItem label="产地：" class="formMust">
+                    <span>{{origin}}</span>
+                </FormItem>
+                <FormItem label="选择品牌系列：" class="formMust" >
+                   <Select @on-change='gets' v-model='formData.rel.carsId'  style='width:200px;'>
+                     <Option v-for='(todo,i) in formData.carsList.list' :key='"1xd"+i' :value='todo[formData.carsList.listId]'>{{todo[formData.carsList.listName]}}</Option>
+                   </Select>
+                    <span v-if='formData.initF&&formData.rel.carsId.toString()==""' class="error-mark">
+                    <Icon type="close-circled"></Icon> 必填
+                    </span>
+                </FormItem>
+                <FormItem label="车型名称：" class="formMust">
+                    <Input v-model="formData.rel.carTypeName" placeholder="请输入版本" style="width:320px;"></Input>
+                    <span v-if='formData.initF && formData.rel.carTypeName == ""' class="error-mark">
+                        <Icon type="close-circled"></Icon> 必填
+                    </span>
+                </FormItem>
+                <FormItem label="版本：" class="formMust">
+                    <Input v-model="formData.rel.version" placeholder="请输入版本" style="width:320px;"></Input>
+                    <span v-if='formData.initF && formData.rel.version == ""' class="error-mark">
+                        <Icon type="close-circled"></Icon> 必填
+                    </span>
+                </FormItem>
+                <FormItem label="选择年份：" class="formMust" >
+                    <DatePicker
+                      :value="formData.rel.produceYear"
+                      @on-change="getDate"
+                      format="yyyy"
+                      type="year"
+                      placement="bottom-end"
+                      placeholder="选择年份"
+                      style="width: 200px"
+                    ></DatePicker>
+                    <span v-if='formData.initF && formData.rel.produceYear == ""' class="error-mark">
+                        <Icon type="close-circled"></Icon> 必填
+                    </span>
+                </FormItem>
+                <FormItem label='档位' class="formMust" >
+                    <RadioGroup v-model = 'formData.rel.gear'>
+                        <Radio label='0'>自动</Radio>
+                        <Radio label='1'>手动</Radio>
+                    </RadioGroup>
+                </FormItem>
+                <FormItem label="排量：" class="formMust">
+                    <Input v-model="formData.rel.emission" placeholder="请输入排量" style="width:320px;"></Input>
+                    <span v-if='formData.initF && formData.rel.emission == ""' class="error-mark">
+                        <Icon type="close-circled"></Icon> 必填
+                    </span>
+                </FormItem>
+                <FormItem label='新能源' class="formMust" >
+                    <RadioGroup v-model = 'formData.rel.newEnergy'>
+                        <Radio label='N'>否</Radio>
+                        <Radio label='Y'>是</Radio>
+                    </RadioGroup>
+                </FormItem>
+                <!-- <FormItem label="指导价：" class="formMust">
+                    <Tooltip placement="top">
+                        <InputNumber :step='1' v-model="formData.rel.instructPrice" placeholder="请输入指导价" style="width:100px;"></InputNumber> 万
+                        <span v-if='formData.initF && formData.rel.instructPrice == ""' class="error-mark">
+                            <Icon type="close-circled"></Icon> 必填
+                        </span>
+                        <div slot="content">
+                            <p>实用型：1~10 万</p>
+                            <p>经济型：10~20 万</p>
+                            <p>中档：30~50 万</p>
+                            <p>中高档：50~80 万</p>
+                            <p>高档：80~120 万</p>
+                            <p>豪华：120~200 万</p>
+                            <p>超豪华：200万以上</p>
+                        </div>
+                    </Tooltip>
+                </FormItem> -->
+            </Form>
+        </div>
+    </div>
+</template>
+
+<script>
+import {upload} from '@/core'
+export default {
+    name: 'bannerAdd',
+    props:["name"],
+    components: {
+        upload
+    },
+    watch:{
+        'formData.rel.brandId': function(brandId){
+
+            let list = this.utils.assign(this.$parent.$parent.carTypeGetByBrand);
+            for(let i in list){
+                if(list[i].brandId == brandId){
+                    if(list[i].carsList && list[i].carsList.length>0){
+                        this.formData.carsList.list = list[i].carsList;
+                    }
+                }
+            }
+        }
+    },
+    data () {
+        return {
+            origin:"根据车品牌自动匹配",
+            formData:{
+                carsList:{
+                    listId:"carsId",
+                    listName:"carsName",
+                    list:[]
+                },
+                brandList:{
+                    listId:"brandId",
+                    listName:"brandName",
+                    list:[]
+                },
+                initF:false,
+                rel:{
+                    deletedYn:"N",
+                    carTypeName:"",
+                    brandId:"",
+                    carsId:"",
+                    produceYear:"",
+                    gear:"0",
+                    emission:"",
+                    newEnergy:"N",
+                    version:"",
+                    instructPrice:0
+                }
+            }
+        }
+    },
+    mounted () {
+        this.formData.brandList.list = JSON.parse(JSON.stringify(this.$parent.$parent.searchData.source.brand.list));
+    },
+    methods: {
+        gets(brandId){
+            let list = this.formData.brandList.list;
+            for(let i in list){
+                if(list[i].brandId == brandId){
+                    this.origin = list[i].origin;
+                }
+            };
+            this.origin = this.origin||"未知产地"
+        },
+        getUpList(url){
+            this.formData.rel.pictureUrl = url;
+        },
+        getDate(date){
+            this.formData.rel.produceYear = date;
+        },
+        save(){
+            let _this = this;
+            this.utils.resolveForm(_this,()=>{
+                this.post(Api.car.type.insert,this.formData.rel,(res)=>{
+                    this.$Message.success("新增汽车品牌成功！");
+                    _this.$parent.$parent.getData();
+                });
+            });
+        },
+    }
+};
+</script>
